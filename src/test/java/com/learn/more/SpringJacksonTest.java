@@ -1,55 +1,37 @@
 package com.learn.more;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.learn.more.entiry.BeanWithFilter;
 import com.learn.more.entiry.Response;
 import com.learn.more.entiry.TypeEnumWithValue;
 import com.learn.more.entiry.User;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-public class JacksonTest {
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest(classes = MoreApplication.class)
+public class SpringJacksonTest {
 
   public static final List<User> users;
-  public static final ObjectMapper MAPPER = new ObjectMapper();
+  @Autowired
+  private ObjectMapper MAPPER;
 
   static {
     User tom = User.builder().id(1L).name("Tom").age(23).password("1234").createTime(new Date()).birthDate(LocalDate.of(1992, 11, 5)).build();
     User xiao = User.builder().id(2L).name("Xiao").age(35).password("45775").createTime(new Date()).build();
     users = Arrays.asList(tom, xiao);
-
-    //    MAPPER.findAndRegisterModules();
-    JavaTimeModule javaTimeModule = new JavaTimeModule();
-    javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-    javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-    MAPPER.registerModule(javaTimeModule);
-
-    MAPPER.setSerializationInclusion(Include.NON_NULL);
-    MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
-    MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    MAPPER.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, true);
-    MAPPER.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
-  }
-
-  @Test
-  public void writeDefault() {
-    System.out.println(users);
   }
 
   @Test

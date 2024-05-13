@@ -31,8 +31,7 @@ public class User {
   private int age;
   @JsonIgnore
   private String password;
-//  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-
+  //  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
   @JsonSerialize(using = CustomDateSerializer.class)
   private Date createTime;
 
