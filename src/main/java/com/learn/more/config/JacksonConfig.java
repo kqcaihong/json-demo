@@ -10,9 +10,14 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 public class JacksonConfig {
 
   @Bean
-  public ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
+  public ObjectMapper objectMapper() {
     CustomDateSerializer dateSerializer = new CustomDateSerializer();
-    ObjectMapper mapper = builder.createXmlMapper(false).serializers(dateSerializer).failOnEmptyBeans(false).failOnUnknownProperties(false).build();
+    ObjectMapper mapper = new Jackson2ObjectMapperBuilder()
+        .createXmlMapper(false)
+        .serializers(dateSerializer)
+        .failOnEmptyBeans(false)
+        .failOnUnknownProperties(false)
+        .build();
     mapper.enable(SerializationFeature.INDENT_OUTPUT);
     mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     return mapper;
