@@ -11,7 +11,7 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 @Configuration
 public class JacksonConfig {
 
-  @Bean
+  @Bean(name = "customMapper")
   public ObjectMapper objectMapper() {
     CustomDateSerializer dateSerializer = new CustomDateSerializer();
     ObjectMapper mapper = new Jackson2ObjectMapperBuilder()
