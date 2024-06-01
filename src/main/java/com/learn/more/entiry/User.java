@@ -1,8 +1,10 @@
 package com.learn.more.entiry;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -22,8 +24,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonIgnoreProperties(value = {"password"}, ignoreUnknown = true)
 @JsonPropertyOrder(alphabetic = true)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class User {
 
   private Long id;
@@ -31,23 +34,16 @@ public class User {
   private int age;
   @JsonIgnore
   private String password;
-  //  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
   @JsonSerialize(using = CustomDateSerializer.class)
   private Date createTime;
 
-  @JsonProperty("birthDay")
-  //  @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @JsonProperty("birthDay")
   private LocalDate birthDate;
 
-  public User(String name, int age) {
-    this.name = name;
-    this.age = age;
-  }
-
-  public User(Long id, String name, int age) {
-    this.id = id;
-    this.name = name;
-    this.age = age;
+  @JsonGetter("birthday")
+  public LocalDate getBirthDate() {
+    return birthDate;
   }
 
   @Override

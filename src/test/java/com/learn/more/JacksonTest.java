@@ -5,11 +5,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
@@ -17,11 +16,17 @@ import com.learn.more.entiry.BeanWithFilter;
 import com.learn.more.entiry.Response;
 import com.learn.more.entiry.TypeEnumWithValue;
 import com.learn.more.entiry.User;
+import com.learn.more.entiry.User1;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
 public class JacksonTest {
@@ -41,10 +46,24 @@ public class JacksonTest {
     MAPPER.registerModule(javaTimeModule);
 
     MAPPER.setSerializationInclusion(Include.NON_NULL);
-    MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
+    //    MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
     MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     MAPPER.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, true);
-    MAPPER.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
+    //    MAPPER.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
+  }
+
+  @Test
+  public void writeUser() {
+    User1 tom = User1.builder().id(1L).name("Tom").age(23).password("1234").birthDate(new Date()).build();
+    try {
+      ObjectMapper mapper = new ObjectMapper();
+      SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+      mapper.setDateFormat(dateFormat);
+      String json = mapper.writeValueAsString(tom);
+      System.out.println(json);
+    } catch (JsonProcessingException e) {
+      // do something
+    }
   }
 
   @Test
@@ -85,12 +104,11 @@ public class JacksonTest {
   // 报错
   @Test
   public void readResponse() throws JsonProcessingException {
-    Response<List<User>> response = new Response<>(true, "", users);
+    String userJson = "[{\"id\":1,\"name\":\"Tom\",\"age\":23,\"password\":\"1234\",\"createTime\":\"2024-05-02 09:24:28\"}, {\"id\":2,"
+        + "\"name\":\"Xiao\",\"age\":35,\"password\":\"45775\",\"createTime\":\"2024-05-02 09:24:28\"}]\n";
     ObjectMapper mapper = new ObjectMapper();
-    String json = mapper.writeValueAsString(response);
-    System.out.println(json);
 
-    Response resp = mapper.readValue(json, Response.class);
+    Response resp = mapper.readValue(userJson, Response.class);
     List<User> data = (List<User>) resp.getData();
     for (User user : data) {
       System.out.println(user);
@@ -129,5 +147,16 @@ public class JacksonTest {
         .writer(filters)
         .writeValueAsString(bean);
     System.out.println(result);
+  }
+
+  @Test
+  public void jdk8Test() throws JsonProcessingException {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new Jdk8Module());
+    // 未注册jdk8模块
+    System.out.println(mapper.writeValueAsString(OptionalInt.of(1)));
+    System.out.println(mapper.writeValueAsString(Optional.of("hello")));
+    System.out.println(mapper.writeValueAsString(IntStream.of(1, 2, 3)));
+    System.out.println(mapper.writeValueAsString(Stream.of("1", "2", "3")));
   }
 }
