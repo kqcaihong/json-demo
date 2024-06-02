@@ -8,11 +8,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import com.learn.more.config.JacksonMixinModule;
 import com.learn.more.entiry.BeanWithFilter;
+import com.learn.more.entiry.ImmutableUser;
+import com.learn.more.entiry.ImmutableUser2;
 import com.learn.more.entiry.Response;
 import com.learn.more.entiry.TypeEnumWithValue;
 import com.learn.more.entiry.User;
@@ -152,11 +155,37 @@ public class JacksonTest {
   @Test
   public void jdk8Test() throws JsonProcessingException {
     ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new Jdk8Module());
     // 未注册jdk8模块
+    //    mapper.registerModule(new Jdk8Module());
     System.out.println(mapper.writeValueAsString(OptionalInt.of(1)));
     System.out.println(mapper.writeValueAsString(Optional.of("hello")));
     System.out.println(mapper.writeValueAsString(IntStream.of(1, 2, 3)));
     System.out.println(mapper.writeValueAsString(Stream.of("1", "2", "3")));
+  }
+
+  @Test
+  public void readImmutableUser() throws JsonProcessingException {
+    String userJson = "{\"name\":\"Tom\",\"age\":23,\"identityCard\":\"61012420000101012x\"}";
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new ParameterNamesModule());
+    ImmutableUser user = mapper.readValue(userJson, ImmutableUser.class);
+    System.out.println(MAPPER.writeValueAsString(user));
+  }
+
+  @Test
+  public void readImmutableUser2() throws JsonProcessingException {
+    String userJson = "{\"name\":\"Tom\",\"age\":23,\"identityCard\":\"61012420000101012x\"}";
+    ObjectMapper mapper = new ObjectMapper();
+    ImmutableUser2 user = mapper.readValue(userJson, ImmutableUser2.class);
+    System.out.println(MAPPER.writeValueAsString(user));
+  }
+
+  @Test
+  public void readImmutableUserMixin() throws JsonProcessingException {
+    String userJson = "{\"name\":\"Tom\",\"age\":23,\"identityCard\":\"61012420000101012x\"}";
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new JacksonMixinModule());
+    ImmutableUser user = mapper.readValue(userJson, ImmutableUser.class);
+    System.out.println(MAPPER.writeValueAsString(user));
   }
 }
